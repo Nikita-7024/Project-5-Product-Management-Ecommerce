@@ -3,8 +3,11 @@ const app = express();
 app.use(express.json());
 const mongoose = require('mongoose');
 const route = require('./routes/route')
+const multer = require('multer');
+
 
 app.use('/', route);
+app.use(multer().any());
 
 try {
     //Insert your MongoDB Atlas String here:
@@ -18,4 +21,4 @@ try {
 
 
 const port = process.env.PORT || 3000;
-app.listen(port, console.log(`Express App running on ${port}`));
+app.listen(port, console.log(`Express App running on ${port} 🚀`));
