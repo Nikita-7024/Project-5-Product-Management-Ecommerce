@@ -1,16 +1,16 @@
 const userModel = require('../models/userModel');
 const validator = require('../utils/validator');
-const aws = require('../aws/profilePicture');
+const aws = require('../aws/s3Upload');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
+
 const createUser = async (req,res)=> {
     try {
         let requestBody = req.body;
         let files = req.files;
        
        
-        if(Object.keys(requestBody).length == 0){
-        return res.status(400).json({status:false, msg: `Please input some data in the body!`});
-        }
         let {fname, lname, email, password ,phone, address} = requestBody;
 
         if(!requestBody.fname){
@@ -69,8 +69,29 @@ const createUser = async (req,res)=> {
         if (!validator.isValidString(address)) {
             return res.status(400).json({ status: false, msg: `address is mandatory field!`});
         }
+        //Shipping address valiadtion.
+        if (!requestBody.address["shipping"]["street"]) {
+            return res.status(400).json({ status: false, msg: `street is mandatory field!` });
+        }
+        if (!requestBody.address["shipping"]["city"]) {
+            return res.status(400).json({ status: false, msg: `city is mandatory field!` });
+        }
+        if (!requestBody.address["shipping"]["pincode"]) {
+            return res.status(400).json({ status: false, msg: `PIN code is mandatory field!` });
+        }
+        //Billing Address Validation.
+        if (!requestBody.address["billing"]["street"]) {
+            return res.status(400).json({ status: false, msg: `street is mandatory field!` });
+        }
+        if (!requestBody.address["billing"]["city"]) {
+            return res.status(400).json({ status: false, msg: `city is mandatory field!` });
+        }
+        if (!requestBody.address["billing"]["pincode"]) {
+            return res.status(400).json({ status: false, msg: `PIN code is mandatory field!` });
+        }
 
         profileImage = await aws.uploadFile(files[0]);
+        
 
         let finalData = {fname, lname, email, password, profileImage ,phone, address};      
         const userData = await userModel.create(finalData);
@@ -79,7 +100,7 @@ const createUser = async (req,res)=> {
         
     } catch (error) {
         res.status(500).json({status:false, error: error.message});
-        console.log(error);
+        
     }
 }
 
@@ -173,7 +194,11 @@ const userLogIn = async (req, res) => {
     try {
         let { userId: _id } = req.params;
         let requestBody = req.body;
-        const {fname, lname, email, password, profileImage ,phone, address} = requestBody;
+        const salt = await bcrypt.genSalt(10);
+        
+
+
+        const {fname, lname, email, profileImage ,phone, address} = requestBody;
   
         if (!validator.isValidObjectId(_id)) {
         return res.status(400).json({ status: false, msg: `Invalid User ID!` });
@@ -184,15 +209,16 @@ const userLogIn = async (req, res) => {
         if (!checkID) {
         return res.status(404).json({ status: false, msg: `${_id} is not present in DB!` });
         }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ status: false, msg: `Invalid eMail Address!` });
+        }
         const isEmailAlreadyUsed = await userModel.findOne({ email: email});
 
         if (isEmailAlreadyUsed) {
         return res.status(400).send({ status: false, message: `${email} already exists!`});
         }
         
-        // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        // return res.status(400).json({ status: false, msg: `Invalid eMail Address!` });
-        // }
+        
         const isPhoneAlreadyUsed = await userModel.findOne({ phone: phone});
         if (isPhoneAlreadyUsed) {
             return res.status(400).send({ status: false, message: `${phone} already exists!`});
@@ -202,14 +228,16 @@ const userLogIn = async (req, res) => {
             //console.log(checkID._id, req.params.userId );
             return res.status(401).json({status: false,msg: `User not authorised to update profile!`});
         }
-
-        const newData = await userModel.findByIdAndUpdate({ _id }, requestBody, {new: true});
+        
+        requestBody.password = await bcrypt.hash(requestBody.password, salt);
+        const newData = await userModel.findByIdAndUpdate({ _id }, requestBody,{new: true});
         res.status(201).json({ status: true, msg: `Updated Successfully`, data: newData });
 
 
 
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });
+        console.log(error);
     }
   }
   

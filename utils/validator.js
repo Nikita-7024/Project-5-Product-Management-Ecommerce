@@ -9,9 +9,15 @@ const isValidString = function(value){
     return true;
 }
 
-const isValidTitle = function (title) {
-    return ["Mr", "Mrs", "Miss"].indexOf(title) !== -1;
-  };
+const isValidSize = function (availableSizes) {
+    return ["S", "XS","M","X", "L","XXL", "XL"].indexOf(availableSizes) !== -1;
+};
+
+const isValidCurrencyId = function (currencyId) {
+    return ["INR", "USD","GBP","EUR", "AED"].indexOf(currencyId) !== -1;
+};
+
+
 
 const isValidPassword = function (password){
     if(password.length <= 15 && password.length >= 8){
@@ -39,11 +45,12 @@ module.exports = {
     
     isValidObjectId,
     isValidString,
-    isValidTitle,
+    isValidSize,
     isValidPassword,
     isValidISBN,
     isValidRating,
-    isValidNumber
+    isValidNumber,
+    isValidCurrencyId
     
     
 }
