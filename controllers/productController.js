@@ -2,6 +2,8 @@ const productModel = require('../models/productModel');
 const validator = require('../utils/validator');
 const aws = require('../aws/s3Upload');
 
+
+
 const createProduct = async (req,res)=>{
     try {
 
@@ -42,12 +44,20 @@ const createProduct = async (req,res)=>{
         if(!validator.isValidString(currencyFormat)){
             return res.status(400).json({status:false, msg: `Please input valid Currency Format!`});
         }
-        if(!validator.isValidSize(availableSizes)){
-            return res.status(400).json({status:false, msg: `Size can only be: S, XS, M,X, L, XXL, XL`});
+        if(!validator.isValidString(availableSizes)){
+            return res.status(400).json({status:false, msg: `Size can only be: S, XS, M, X, L, XXL, XL`});
         }
-        if(!validator.isValidCurrencyId(currencyId)){
+        if(!validator.isValidString(currencyId)){
             return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
         }
+
+        if(!/\b(?:USD|AUD|BRL|GBP|CAD|CNY|DKK|AED|EUR|HKD|INR|MYR|MXN|NZD|PHP|SGD|THB|ARS|COP|CLP|PEN|VEF)\b/.test(currencyId)){
+            return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
+        }
+        
+
+
+        
 
 
         productImage = await aws.uploadFile(files[0]);
@@ -61,6 +71,81 @@ const createProduct = async (req,res)=>{
         res.status(500).json({ status: false, error: error.message });
     }
 }
+
+const getProductsByFilter = async (req,res)=> {
+    try {
+
+        const {name, size, priceGreaterThan, priceLessThan, priceSort} = req.query;
+
+        const queryFilter = {};
+        queryFilter.isDeleted = false;
+
+        if(name){
+            queryFilter.title = { $regex: name, $options: 'i' };
+            //for substring searching
+        }
+
+        if(size){
+            queryFilter.availableSizes = size;
+        }
+
+        if(priceGreaterThan){
+            queryFilter.price = {$gt: priceGreaterThan};
+        }
+
+        if(priceLessThan){
+            queryFilter.price = {$lt: priceLessThan};
+        }
+        
+
+        let result = await productModel.find(queryFilter).sort({ price: priceSort});
+
+        const products = await result;
+        
+        if (!(products.length > 0)) {
+            return res.status(404).json({ status: false, msg: `No Product found with given filters!` });
+        }
+      
+        res.status(200).json({status: true, data: products});
+
+        
+    } catch (error) {
+        res.status(500).json({ status: false, error: error.message });
+    }
+
+}
+// const getBooks = async (req, res) => {
+//   try {
+//     let queryFilter = req.query;
+//     queryFilter.isDeleted = false;
+
+//     const books = await bookModel
+//       .find(queryFilter)
+//       .select({
+//         _id: 1,
+//         title: 1,
+//         excerpt: 1,
+//         userId: 1,
+//         category: 1,
+//         releasedAt: 1,
+//       });
+//     if (!(books.length > 0)) {
+//       return res
+//         .status(404)
+//         .json({ status: false, msg: `No Book found with matching filters!` });
+//     }
+//     const sortedBooks = books.sort((a, b) => a.title.localeCompare(b.title));
+//     res.status(200).json({ status: true, data: sortedBooks });
+//   } catch (error) {
+//     res.status(500).json({ status: false, error: error.message });
+//   }
+// };
+
+
+
+
+
+
 
 const getProductsById = async (req,res) => {
     try {
@@ -127,9 +212,17 @@ const updateProductById = async (req,res)=>{
         if(!validator.isValidString(requestBody.currencyId)){
             return res.status(400).json({status:false, msg: `Please input valid Currency ID!`});
         }
-        if(!validator.isValidCurrencyId(requestBody.currencyId)){
+        
+        // if(!validator.isValidString(currencyId)){
+        //     return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
+        // }
+
+        if(!/\b(?:USD|AUD|BRL|GBP|CAD|CNY|DKK|AED|EUR|HKD|INR|MYR|MXN|NZD|PHP|SGD|THB|ARS|COP|CLP|PEN|VEF)\b/.test(currencyId)){
             return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
         }
+           
+
+
         
         // if(!validator.isValidString(requestBody.currencyFormat)){
         //     return res.status(400).json({status:false, msg: `Please input valid Currency Format!`});
@@ -183,6 +276,7 @@ const deleteProductById = async (req, res) => {
 
 module.exports = {
     createProduct,
+    getProductsByFilter,
     updateProductById,
     getProductsById,
     deleteProductById

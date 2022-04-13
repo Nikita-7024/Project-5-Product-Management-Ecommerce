@@ -20,6 +20,8 @@ router.put('/user/:userId/profile', middleware.auth, userController.updateUserPr
 //product APIs
 router.post('/products', productController.createProduct);
 
+router.get('/products', productController.getProductsByFilter);
+
 router.get('/products/:productId', productController.getProductsById);
 
 router.put('/products/:productId', productController.updateProductById);
