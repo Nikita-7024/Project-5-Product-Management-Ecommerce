@@ -86,7 +86,7 @@ const getProductsByFilter = async (req,res)=> {
         }
 
         if(size){
-            queryFilter.availableSizes = size;
+            queryFilter.availableSizes = {$regex: size};
         }
 
         if(priceGreaterThan){

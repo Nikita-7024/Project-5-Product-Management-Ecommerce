@@ -231,7 +231,7 @@ const userLogIn = async (req, res) => {
         }
         
         //requestBody.password = await bcrypt.hash(requestBody.password, 10);
-        profileImage = await aws.uploadFile(files[0]);
+        //profileImage = await aws.uploadFile(files[0]);
 
         const doc = new userModel();
 
