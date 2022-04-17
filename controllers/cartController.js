@@ -14,24 +14,32 @@ const createCart = async (req,res) => {
         if(Object.keys(req.body).length == 0)
             return res.status(400).json({status:false, msg:`Invalid Input. Body can't be empty!`});
         
-        const {userId, items ,productId, quantity} = req.body;
+        const {userId, items } = req.body;
     
         if(!validator.isValidObjectId(userId))
             return res.status(400).json({status:false, msg:`Invalid User ID!`});
         
-        if(!validator.isValidObjectId(productId))
+        if(!validator.isValidObjectId(items[0].productId))
             return res.status(400).json({status:false, msg:`Invalid Product ID!`});    
         
-        // const checkProductId = await productModel.findById(req.body.productId);
-        // console.log(checkProductId);
-        // if(!checkProductId)
-        //     return res.status(400).json({status:false, msg:`${req.body.productId} doesn't exist in DB!`}); 
+             
+        if(!validator.isValidNumber(items[0].quantity))
+            return res.status(400).json({status:false, msg:`Invalid Input. Quantity should have a numeric value!`}); 
+        
+        const findProduct = await productModel.findById(req.body.items[0].productId);//checking for product
+        const productCost = findProduct.price; //extracting product price
 
-        if(!validator.isValidNumber(quantity))
-            return res.status(400).json({status:false, msg:`Invalid Input. Quantity should have a numeric value!`});    
-    
-        const cartData = await cartModel.create(req.body);
+        let productQuantity = req.body.items[0].quantity;
+        console.log(productQuantity);
+        
+        let totalPrice = productCost * productQuantity;
+        let totalItems = productQuantity;
+
+        let finalData = {userId, items, totalPrice, totalItems};
+
+        const cartData = await cartModel.create(finalData);
         res.status(201).json({status:true, data: cartData});
+        
      
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });

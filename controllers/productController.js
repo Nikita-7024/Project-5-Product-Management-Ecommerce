@@ -9,7 +9,7 @@ const createProduct = async (req,res)=>{
 
         let requestBody = req.body;
         let files = req.files;
-        const {title, description, price, currencyId, currencyFormat,availableSizes,isFreeShipping, style, installments, deletedAt, isDeleted} = requestBody;
+        const {title, description, price, availableSizes,isFreeShipping, style, installments, deletedAt, isDeleted} = requestBody;
         if(!requestBody.title){
             return res.status(400).json({status:false, msg: `Title is mandatory!`});  
         }
@@ -32,36 +32,16 @@ const createProduct = async (req,res)=>{
         if(!validator.isValidNumber(price)){
             return res.status(400).json({status:false, msg: `Please input valid Price(Numeric Values Only)!`});
         }
-        if(!requestBody.currencyId){
-            return res.status(400).json({status:false, msg: `Currency ID is mandatory!`});  
-        }
-        if(!validator.isValidString(currencyId)){
-            return res.status(400).json({status:false, msg: `Please input valid Currency ID!`});
-        }
-        if(!requestBody.currencyFormat){
-            return res.status(400).json({status:false, msg: `Currency Format is mandatory!`});  
-        }
-        if(!validator.isValidString(currencyFormat)){
-            return res.status(400).json({status:false, msg: `Please input valid Currency Format!`});
-        }
+        
         if(!validator.isValidString(availableSizes)){
             return res.status(400).json({status:false, msg: `Size can only be: S, XS, M, X, L, XXL, XL`});
         }
-        if(!validator.isValidString(currencyId)){
-            return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
-        }
-
-        if(!/\b(?:USD|AUD|BRL|GBP|CAD|CNY|DKK|AED|EUR|HKD|INR|MYR|MXN|NZD|PHP|SGD|THB|ARS|COP|CLP|PEN|VEF)\b/.test(currencyId)){
-            return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
-        }
         
 
-
         
-
 
         productImage = await aws.uploadFile(files[0]);
-        let finalData = {title, description, price, currencyId, currencyFormat, isFreeShipping, productImage, style, availableSizes, installments ,deletedAt, isDeleted};      
+        let finalData = {title, description, price, isFreeShipping, productImage, style, availableSizes, installments ,deletedAt, isDeleted};      
         const userData = await productModel.create(finalData);
         res.status(201).json({status:true, data:userData});
 
@@ -176,7 +156,7 @@ const updateProductById = async (req,res)=>{
     try {
         let { productId: _id } = req.params;
         let requestBody = req.body;
-        const {title, description, price, currencyId, currencyFormat,availableSizes} = requestBody;
+        const {title, description, price, availableSizes} = requestBody;
   
         if (!validator.isValidObjectId(_id)) {
         return res.status(400).json({ status: false, msg: `Invalid Product ID!` });
@@ -209,24 +189,11 @@ const updateProductById = async (req,res)=>{
             return res.status(400).json({status:false, msg: `Please input valid Price(Numeric Values Only)!`});
         }
         
-        if(!validator.isValidString(requestBody.currencyId)){
-            return res.status(400).json({status:false, msg: `Please input valid Currency ID!`});
-        }
         
-        // if(!validator.isValidString(currencyId)){
-        //     return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
-        // }
-
-        if(!/\b(?:USD|AUD|BRL|GBP|CAD|CNY|DKK|AED|EUR|HKD|INR|MYR|MXN|NZD|PHP|SGD|THB|ARS|COP|CLP|PEN|VEF)\b/.test(currencyId)){
-            return res.status(400).json({status:false, msg: `Currency ID can only be: INR, USD, GBP, EUR, AED`});
-        }
-           
 
 
         
-        // if(!validator.isValidString(requestBody.currencyFormat)){
-        //     return res.status(400).json({status:false, msg: `Please input valid Currency Format!`});
-        // }
+       
         // if(!validator.isValidSize(requestBody.availableSizes)){
         //     return res.status(400).json({status:false, msg: `Size can only be: S, XS, M, X, L, XXL, XL`});
         // }
