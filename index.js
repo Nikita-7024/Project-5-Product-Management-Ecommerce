@@ -10,7 +10,7 @@ app.use('/', route);
 
 try {
     //Insert your MongoDB Atlas String here:
-    mongoose.connect("mongodb://0.0.0.0:27017/Products-Management", {useNewUrlParser:true});
+    mongoose.connect("mongodb+srv://vpandey:qVLIgv7EqMycOrmr@cluster0.lvp0c.mongodb.net/group13Database?retryWrites=true&w=majority", {useNewUrlParser:true});
     console.log(`MongoDB Connection Successful`);
 } catch (error) {
     console.log(error);

@@ -7,25 +7,29 @@ const productModel = require('../models/productModel');
 const createCart = async (req,res) => {
 
     try {
-
-        const bearerHeader = req.headers['authorization'];
-        if(!bearerHeader){
-            return res.status(400).json({status:false, msg:`Bearer Token Missing!`});
-        }
-        
         
         let userIdFromParams = req.params.userId;
+
         if(!validator.isValidObjectId(userIdFromParams))
-            return res.status(400).json({status:false, msg:`Invalid User ID!`});
-    
+            return res.status(400).json({status:false, msg:`Invalid User ID in params!`});
+        
+        const bearerHeader = req.headers['authorization'];
+        if(!bearerHeader){
+            return res.status(400).json({status:false, msg:`Bearer Token Missing!`})
+        }
+            
+        const {userId, items } = req.body;
+
         if(Object.keys(req.body).length == 0)
             return res.status(400).json({status:false, msg:`Invalid Input. Body can't be empty!`});
-        
-        const {userId, items } = req.body;
+
+        if(!items)
+            return res.status(400).json({status:false, msg:`item value is required , please provide valid data`});
     
         if(!validator.isValidObjectId(userId))
             return res.status(400).json({status:false, msg:`Invalid User ID!`});
         
+
         if(!validator.isValidObjectId(items[0].productId))
             return res.status(400).json({status:false, msg:`Invalid Product ID!`});    
         
@@ -34,7 +38,13 @@ const createCart = async (req,res) => {
             return res.status(400).json({status:false, msg:`Invalid Input. Quantity should have a numeric value!`}); 
         
         const findProduct = await productModel.findById(req.body.items[0].productId);//checking for product
+        if(!findProduct)
+            return res.status(400).json({status:false, msg:`productId is not valid`});
+        
         const productCost = findProduct.price; //extracting product price
+
+        if(!productCost)
+            return res.status(400).json({status:false, msg:`price is not present with thhis productId`});
 
         let productQuantity = req.body.items[0].quantity;
         //console.log(productQuantity);

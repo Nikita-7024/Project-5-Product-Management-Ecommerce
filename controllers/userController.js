@@ -153,9 +153,7 @@ const userLogIn = async (req, res) => {
       });
     
       const isValidPassword = await bcrypt.compare(req.body.password, findUser.password)
-      
-      
-      
+        
       
       if (!isValidPassword) {
         return res
