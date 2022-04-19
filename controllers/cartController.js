@@ -185,13 +185,3 @@ module.exports = {
 
 
 
-
-
-
-    //check if bearer is undefined
-    
-
-        //split the space at the bearer
-        
-        //Get token from string
-       
