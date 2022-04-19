@@ -43,6 +43,9 @@ router.delete('/users/:userId/cart', middleware.auth, cartController.deleteCartB
 
 router.post('/users/:userId/orders', orderController.createOrder);
 
+router.put('/users/:userId/orders', orderController.updateOrder);
+
+
 
 
 

@@ -40,6 +40,11 @@ const isValidNumber = function(value){
     return true;
 }
 
+const isValidStatus = function (status) {
+    return ["pending", "completed", "cancled"].indexOf(status) !== -1;
+};
+
+
 
 module.exports = {
     
@@ -50,7 +55,8 @@ module.exports = {
     isValidISBN,
     isValidRating,
     isValidNumber,
-    isValidCurrencyId
+    isValidCurrencyId,
+    isValidStatus
     
     
 }

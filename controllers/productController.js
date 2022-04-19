@@ -94,35 +94,6 @@ const getProductsByFilter = async (req,res)=> {
     }
 
 }
-// const getBooks = async (req, res) => {
-//   try {
-//     let queryFilter = req.query;
-//     queryFilter.isDeleted = false;
-
-//     const books = await bookModel
-//       .find(queryFilter)
-//       .select({
-//         _id: 1,
-//         title: 1,
-//         excerpt: 1,
-//         userId: 1,
-//         category: 1,
-//         releasedAt: 1,
-//       });
-//     if (!(books.length > 0)) {
-//       return res
-//         .status(404)
-//         .json({ status: false, msg: `No Book found with matching filters!` });
-//     }
-//     const sortedBooks = books.sort((a, b) => a.title.localeCompare(b.title));
-//     res.status(200).json({ status: true, data: sortedBooks });
-//   } catch (error) {
-//     res.status(500).json({ status: false, error: error.message });
-//   }
-// };
-
-
-
 
 
 
