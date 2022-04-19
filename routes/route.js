@@ -41,9 +41,9 @@ router.delete('/users/:userId/cart', middleware.auth, cartController.deleteCartB
 
 //order APIs
 
-router.post('/users/:userId/orders', orderController.createOrder);
+router.post('/users/:userId/orders', middleware.auth, orderController.createOrder);
 
-router.put('/users/:userId/orders', orderController.updateOrder);
+router.put('/users/:userId/orders', middleware.auth, orderController.updateOrder);
 
 
 

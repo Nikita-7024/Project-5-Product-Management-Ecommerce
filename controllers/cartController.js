@@ -49,17 +49,29 @@ const createCart = async (req,res) => {
 const updateCart = async(req,res)=>{
 
     try {
+    let {userId: _id} = req.params
+    if(!validator.isValidObjectId(_id))
+        return res.status(400).json({status:false, msg:`Invalid User ID!`});
+
     let requestBody = req.body;
     const {cartId, productId, items} = requestBody;
 
     const ifCartExists = await cartModel.findById(requestBody.cartId);
+    if(!ifCartExists){
+        return res.status(404).json({status:false, msg: `No Cart Found!`})
+    }
+    if(!validator.isValidObjectId(requestBody.cartId)){
+        return res.status(400).json({status:false, msg:`Invalid Cart ID!`});
+    }
     const cartID = ifCartExists._id.toString();
+
+    
+
     console.log(cartID);
     
-    if(!ifCartExists){
-        res.status(404).json({status:false, msg: `No Cart Found!`})
-    }
+    
     const ifProductExists = await productModel.findById(requestBody.productId);
+
     const productID = ifProductExists._id.toString();
     console.log(productID);
     if(!ifProductExists){

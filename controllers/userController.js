@@ -90,6 +90,9 @@ const createUser = async (req,res)=> {
         if (!requestBody.address["billing"]["pincode"]) {
             return res.status(400).json({ status: false, msg: `PIN code is mandatory field!` });
         }
+        if(!files.length > 0){
+            return res.status(400).json({ status: false, msg: `Profile Photo is mandatory!` });
+        }
 
         profileImage = await aws.uploadFile(files[0]);
         
@@ -146,9 +149,15 @@ const userLogIn = async (req, res) => {
   
       const findUser = await userModel.findOne({
         email: email,
-        password: password,
+        
       });
-      if (!findUser) {
+    
+      const isValidPassword = await bcrypt.compare(req.body.password, findUser.password)
+      
+      
+      
+      
+      if (!isValidPassword) {
         return res
           .status(401)
           .json({ status: false, msg: `Invalid email or password!` });
@@ -258,9 +267,7 @@ module.exports = {
 
 
 
-//regex - set of chars used for validation 
 
-///^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 
 
