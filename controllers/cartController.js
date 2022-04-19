@@ -56,16 +56,19 @@ const createCart = async (req,res) => {
 const updateCart = async(req,res)=>{
 
     try {
-        const bearerHeader = req.headers['authorization'];
-        if(!bearerHeader){
-        return res.status(400).json({status:false, msg:`Bearer Token Missing!`});
-        }   
+
+        let requestBody = req.body;
+        const {cartId, productId, items} = requestBody;
+
         let {userId: _id} = req.params
         if(!validator.isValidObjectId(_id))
         return res.status(400).json({status:false, msg:`Invalid User ID!`});
 
-        const {cartId, productId, items} = requestBody;
-        let requestBody = req.body;
+        
+        const bearerHeader = req.headers['authorization'];
+        if(!bearerHeader){
+            return res.status(400).json({status:false, msg:`Bearer Token Missing!`});
+        }   
 
         const ifCartExists = await cartModel.findById(requestBody.cartId);
         if(!ifCartExists){
@@ -97,7 +100,7 @@ const updateCart = async(req,res)=>{
     
         const productQuantity = exsitingQuantity - req.body.items[0].quantity;
         const checkNewQuantity = productQuantity;
-        console.log(checkNewQuantity);
+        //console.log(checkNewQuantity);
 
         const productCost = ifProductExists.price; 
         // console.log(productCost); 
