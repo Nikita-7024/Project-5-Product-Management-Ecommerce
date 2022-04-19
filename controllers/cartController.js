@@ -7,6 +7,13 @@ const productModel = require('../models/productModel');
 const createCart = async (req,res) => {
 
     try {
+
+        const bearerHeader = req.headers['authorization'];
+        if(!bearerHeader){
+            return res.status(400).json({status:false, msg:`Bearer Token Missing!`});
+        }
+        
+        
         let userIdFromParams = req.params.userId;
         if(!validator.isValidObjectId(userIdFromParams))
             return res.status(400).json({status:false, msg:`Invalid User ID!`});
@@ -49,64 +56,73 @@ const createCart = async (req,res) => {
 const updateCart = async(req,res)=>{
 
     try {
-    let {userId: _id} = req.params
-    if(!validator.isValidObjectId(_id))
+        const bearerHeader = req.headers['authorization'];
+        if(!bearerHeader){
+        return res.status(400).json({status:false, msg:`Bearer Token Missing!`});
+        }   
+        let {userId: _id} = req.params
+        if(!validator.isValidObjectId(_id))
         return res.status(400).json({status:false, msg:`Invalid User ID!`});
 
-    let requestBody = req.body;
-    const {cartId, productId, items} = requestBody;
+        const {cartId, productId, items} = requestBody;
+        let requestBody = req.body;
 
-    const ifCartExists = await cartModel.findById(requestBody.cartId);
-    if(!ifCartExists){
-        return res.status(404).json({status:false, msg: `No Cart Found!`})
-    }
-    if(!validator.isValidObjectId(requestBody.cartId)){
-        return res.status(400).json({status:false, msg:`Invalid Cart ID!`});
-    }
-    const cartID = ifCartExists._id.toString();
+        const ifCartExists = await cartModel.findById(requestBody.cartId);
+        if(!ifCartExists){
+            return res.status(404).json({status:false, msg: `No Cart Found!`})
+        }   
+        if(!validator.isValidObjectId(requestBody.cartId)){
+            return res.status(400).json({status:false, msg:`Invalid Cart ID!`});
+        }
+        const cartID = ifCartExists._id.toString();
 
     
 
-    console.log(cartID);
+        //console.log(cartID);
     
     
-    const ifProductExists = await productModel.findById(requestBody.productId);
+        const ifProductExists = await productModel.findById(requestBody.productId);
 
-    const productID = ifProductExists._id.toString();
-    console.log(productID);
-    if(!ifProductExists){
-        res.status(404).json({status:false, msg: `No Product Found!`})
-    }
+        const productID = ifProductExists._id.toString();
+        //console.log(productID);
 
-    //cartModel---->quantity---->quantity-{removeItem}---->priceUpdate
+        if(!ifProductExists){
+         res.status(404).json({status:false, msg: `No Product Found!`})
+        }
 
-    const exsitingQuantity = ifCartExists.items[0].quantity; 
-    // console.log(exsitingQuantity);
+        //cartModel---->quantity---->quantity-{removeItem}---->priceUpdate
+
+        const exsitingQuantity = ifCartExists.items[0].quantity; 
+        //console.log(exsitingQuantity);
     
-    const productQuantity = exsitingQuantity - req.body.items[0].quantity;
-    const checkNewQuantity = productQuantity;
-    console.log(checkNewQuantity);
+        const productQuantity = exsitingQuantity - req.body.items[0].quantity;
+        const checkNewQuantity = productQuantity;
+        console.log(checkNewQuantity);
 
-    const productCost = ifProductExists.price; 
-    // console.log(productCost); 
-    // console.log(productQuantity); 
+        const productCost = ifProductExists.price; 
+        // console.log(productCost); 
+        // console.log(productQuantity); 
 
-    let totalPrice = productCost * productQuantity;
-    let totalItems = productQuantity;
+        let totalPrice = productCost * productQuantity;
+        let totalItems = productQuantity;
 
-    let finalData = {totalPrice, totalItems, cartID, items};
+        let finalData = {totalPrice, totalItems, cartID, items};
 
 
-    const cartData = await cartModel.findByIdAndUpdate(cartID, finalData, {new:true});
-    res.status(201).json({status:true, msg: `Cart Updated Succesfully`, data:cartData});
+        const cartData = await cartModel.findByIdAndUpdate(cartID, finalData, {new:true});
+        res.status(201).json({status:true, msg: `Cart Updated Succesfully`, data:cartData});
 
-    } catch (error) {
+    }catch (error) {
         res.status(500).json({ status: false, error: error.message });
     }
 }    
 
 const getCartById = async (req,res)=>{
     try {
+        const bearerHeader = req.headers['authorization'];
+        if(!bearerHeader){
+            return res.status(400).json({status:false, msg:`Bearer Token Missing!`});
+        }
         let { userId: _id } = req.params;
         if (!validator.isValidObjectId(_id)) {
             return res.status(400).json({ status: false, msg: `Invalid ID!` });
@@ -128,6 +144,10 @@ const getCartById = async (req,res)=>{
 
 const deleteCartById = async (req,res)=>{
     try {
+        const bearerHeader = req.headers['authorization'];
+        if(!bearerHeader){
+            return res.status(400).json({status:false, msg:`Bearer Token Missing!`});
+        }
         let { userId: _id } = req.params;
         if (!validator.isValidObjectId(_id)) {
             return res.status(400).json({ status: false, msg: `Invalid ID!` });
@@ -161,3 +181,17 @@ module.exports = {
     getCartById,
     deleteCartById
 }
+
+
+
+
+
+
+
+    //check if bearer is undefined
+    
+
+        //split the space at the bearer
+        
+        //Get token from string
+       

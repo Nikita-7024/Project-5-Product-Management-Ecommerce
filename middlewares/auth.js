@@ -6,7 +6,9 @@ const auth = async (req, res, next) => {
     let token = req.headers["x-api-key"];
     if (!token) {
       return res.status(400).json({ status: false, msg: "Token is Missing!" });
-    } else {
+    } 
+    
+    else {
       let decodedToken = jwt.verify(token, "thorium@group8");
       if (decodedToken) {
         req.user = decodedToken;

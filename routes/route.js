@@ -31,13 +31,13 @@ router.put('/products/:productId', productController.updateProductById);
 router.delete('/products/:productId', productController.deleteProductById);
 
 //cart APIs
-router.post('/users/:userId/cart', middleware.auth ,cartController.createCart);
+router.post('/users/:userId/cart',  cartController.createCart);
 
-router.put('/users/:userId/cart', middleware.auth, cartController.updateCart);
+router.put('/users/:userId/cart',  cartController.updateCart);
 
-router.get('/users/:userId/cart', middleware.auth ,cartController.getCartById);
+router.get('/users/:userId/cart', cartController.getCartById);
 
-router.delete('/users/:userId/cart', middleware.auth, cartController.deleteCartById);
+router.delete('/users/:userId/cart',  cartController.deleteCartById);
 
 //order APIs
 
