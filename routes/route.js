@@ -10,7 +10,7 @@ const multer = require('multer');
 router.use(multer().any());
 
 
-//user APIs
+//user APIs-----------------------------------
 router.post('/register', userController.createUser);
 
 router.post('/login', userController.userLogIn);
@@ -19,7 +19,7 @@ router.get('/user/:userId/profile', middleware.auth ,userController.getUserProfi
 
 router.put('/user/:userId/profile', middleware.auth, userController.updateUserProfile);
 
-//product APIs
+//product APIs---------------------------------
 router.post('/products', productController.createProduct);
 
 router.get('/products', productController.getProductsByFilter);
@@ -30,7 +30,7 @@ router.put('/products/:productId', productController.updateProductById);
 
 router.delete('/products/:productId', productController.deleteProductById);
 
-//cart APIs
+//cart APIs------------------------------------
 router.post('/users/:userId/cart',  cartController.createCart);
 
 router.put('/users/:userId/cart',  cartController.updateCart);
@@ -39,7 +39,7 @@ router.get('/users/:userId/cart', cartController.getCartById);
 
 router.delete('/users/:userId/cart',  cartController.deleteCartById);
 
-//order APIs
+//order APIs----------------------------
 
 router.post('/users/:userId/orders', middleware.auth, orderController.createOrder);
 

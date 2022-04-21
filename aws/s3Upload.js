@@ -7,18 +7,18 @@ aws.config.update({
 });
 
 let uploadFile = async (file) => {
-    return new Promise(function (resolve, reject) { 
+    return new Promise(function (resolve, reject) {
 
-        
+
         let s3 = new aws.S3({ apiVersion: "2006-03-01" });
         var uploadParams = {
-            ACL: "public-read", 
+            ACL: "public-read",
             Bucket: "classroom-training-bucket", // 
-            Key: "Project5-Group8/"+ file.originalname,
+            Key: "Project5-Group8/" + file.originalname,
             Body: file.buffer,
         };
 
-        
+
         s3.upload(uploadParams, function (err, data) {
             if (err) {
                 return reject({ "error": err });

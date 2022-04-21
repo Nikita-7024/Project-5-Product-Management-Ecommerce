@@ -25,15 +25,7 @@ const isValidPassword = function (password){
     }
 
 }  
-const isValidISBN = function(ISBN){
-    if(ISBN.length === 13)
-    return true;
-}
 
-const isValidRating = function(rating){
-    if(rating <= 5 && rating >= 1) return true
-    return false;
-}
 
 const isValidNumber = function(value){
     if(isNaN(value)) return false;
@@ -52,8 +44,6 @@ module.exports = {
     isValidString,
     isValidSize,
     isValidPassword,
-    isValidISBN,
-    isValidRating,
     isValidNumber,
     isValidCurrencyId,
     isValidStatus

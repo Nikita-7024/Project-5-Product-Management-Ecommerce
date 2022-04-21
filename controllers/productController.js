@@ -9,7 +9,9 @@ const createProduct = async (req,res)=>{
 
         let requestBody = req.body;
         let files = req.files;
-        const {title, description, price, availableSizes,isFreeShipping, style, installments, deletedAt, isDeleted} = requestBody;
+        const {title, description, price, availableSizes,isFreeShipping, style, installments, deletedAt, isDeleted} = requestBody;             //Destructuring method
+
+        // validation start  ------------------------------
         if(!requestBody.title){
             return res.status(400).json({status:false, msg: `Title is mandatory!`});  
         }
@@ -36,15 +38,14 @@ const createProduct = async (req,res)=>{
         if(!validator.isValidString(availableSizes)){
             return res.status(400).json({status:false, msg: `Size can only be: S, XS, M, X, L, XXL, XL`});
         }
-        
+        // validation ends -----------------
 
-        
+        productImage = await aws.uploadFile(files[0]);  //upload aws s3 file-
 
-        productImage = await aws.uploadFile(files[0]);
+        // create products --------------
         let finalData = {title, description, price, isFreeShipping, productImage, style, availableSizes, installments ,deletedAt, isDeleted};      
         const userData = await productModel.create(finalData);
         res.status(201).json({status:true, data:userData});
-
 
         
     } catch (error) {
@@ -55,7 +56,7 @@ const createProduct = async (req,res)=>{
 const getProductsByFilter = async (req,res)=> {
     try {
 
-        const {name, size, priceGreaterThan, priceLessThan, priceSort} = req.query;
+        const {name, size, priceGreaterThan, priceLessThan, priceSort} = req.query;   //Destructuring method -
 
         const queryFilter = {};
         queryFilter.isDeleted = false;
@@ -104,12 +105,15 @@ const getProductsById = async (req,res) => {
         if (!validator.isValidObjectId(_id)) {
             return res.status(400).json({ status: false, msg: `Invalid Product ID!` });
         }
+
         const userData = await productModel.findById(_id);
 
         if (!userData) {
             return res.status(404).json({ status: false, msg: `${_id} is not present in DB!` });
         }
+
         const idAlreadyDeleted = await productModel.findOne({ _id: _id });
+
         if (idAlreadyDeleted.isDeleted === true) {
         return res.status(404).json({ status: false, msg: `Product Not Found or Deleted!` });
         }
@@ -127,7 +131,7 @@ const updateProductById = async (req,res)=>{
     try {
         let { productId: _id } = req.params;
         let requestBody = req.body;
-        const {title, description, price, availableSizes} = requestBody;
+        const {title, description, price, availableSizes} = requestBody; //Destructuring method-
   
         if (!validator.isValidObjectId(_id)) {
         return res.status(400).json({ status: false, msg: `Invalid Product ID!` });
@@ -138,10 +142,13 @@ const updateProductById = async (req,res)=>{
         if (!checkID) {
         return res.status(404).json({ status: false, msg: `${_id} is not present in DB!` });
         }
+
         const idAlreadyDeleted = await productModel.findOne({ _id: _id });
+
         if (idAlreadyDeleted.isDeleted === true) {
         return res.status(400).json({ status: false, msg: `Product already deleted!` });
         }
+
         const isTitleAlreadyUsed = await productModel.findOne({ title: title});
 
         if (isTitleAlreadyUsed) {
@@ -151,7 +158,6 @@ const updateProductById = async (req,res)=>{
             return res.status(400).json({status:false, msg: `Please input valid Title!`});
         }
 
-
         if(!validator.isValidString(description)){
             return res.status(400).json({status:false, msg: `Please input valid Description!`});
         }
@@ -159,17 +165,9 @@ const updateProductById = async (req,res)=>{
         if(!validator.isValidNumber(price)){
             return res.status(400).json({status:false, msg: `Please input valid Price(Numeric Values Only)!`});
         }
-        
-        
 
 
-        
-       
-        // if(!validator.isValidSize(requestBody.availableSizes)){
-        //     return res.status(400).json({status:false, msg: `Size can only be: S, XS, M, X, L, XXL, XL`});
-        // }
-        
-
+        // update  Product --------
         const newData = await productModel.findByIdAndUpdate({ _id }, requestBody, {new: true});
         res.status(201).json({ status: true, msg: `Updated Successfully`, data: newData });
         
@@ -184,6 +182,7 @@ const deleteProductById = async (req, res) => {
       if (!validator.isValidObjectId(_id)) {
         return res.status(400).json({ status: false, msg: `Invalid Product ID!` });
       }
+
       const checkID = await productModel.findById(_id);
   
       if (!checkID) {
@@ -193,6 +192,7 @@ const deleteProductById = async (req, res) => {
         }
   
       const idAlreadyDeleted = await productModel.findOne({ _id: _id });
+      
       if (idAlreadyDeleted.isDeleted === true) {
         return res
           .status(400)
