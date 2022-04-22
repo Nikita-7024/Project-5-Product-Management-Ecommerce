@@ -10,7 +10,7 @@ const multer = require('multer');
 router.use(multer().any());
 
 
-//user APIs-----------------------------------
+//user APIs----------------------------------------------------
 router.post('/register', userController.createUser);
 
 router.post('/login', userController.userLogIn);
@@ -19,35 +19,31 @@ router.get('/user/:userId/profile', middleware.auth ,userController.getUserProfi
 
 router.put('/user/:userId/profile', middleware.auth, userController.updateUserProfile);
 
-//product APIs---------------------------------
+//product APIs----------------------------------------
 router.post('/products', productController.createProduct);
 
 router.get('/products', productController.getProductsByFilter);
 
-router.get('/products/:productId', productController.getProductsById);
+router.get('/products/:productId', middleware.auth ,productController.getProductsById);
 
 router.put('/products/:productId', productController.updateProductById);
 
 router.delete('/products/:productId', productController.deleteProductById);
 
-//cart APIs------------------------------------
-router.post('/users/:userId/cart',  cartController.createCart);
+//cart APIs-----------------------------
+router.post('/users/:userId/cart',  middleware.auth , cartController.createCart);
 
-router.put('/users/:userId/cart',  cartController.updateCart);
+router.put('/users/:userId/cart',  middleware.auth , cartController.updateCart);
 
-router.get('/users/:userId/cart', cartController.getCartById);
+router.get('/users/:userId/cart', middleware.auth , cartController.getCartById);
 
-router.delete('/users/:userId/cart',  cartController.deleteCartById);
+router.delete('/users/:userId/cart',  middleware.auth , cartController.deleteCartById);
 
 //order APIs----------------------------
 
 router.post('/users/:userId/orders', middleware.auth, orderController.createOrder);
 
 router.put('/users/:userId/orders', middleware.auth, orderController.updateOrder);
-
-
-
-
 
 
 

@@ -126,9 +126,9 @@ const userLogIn = async (req, res) => {
                     msg: `Invalid input. Please enter email and password!`,
                 });
         }
-        const { email, password } = requestBody;
+        const { email, password } = requestBody;    // Destructuring method 
 
-        //   validation start --------------
+        // Validation start ----------------------
         if (!requestBody.email) {
             return res
                 .status(400)
@@ -144,8 +144,6 @@ const userLogIn = async (req, res) => {
                 .status(400)
                 .json({ status: false, msg: `Invalid eMail Address!` });
         }
-
-        // password validation ---------------
         if (!requestBody.password) {
             return res
                 .status(400)
@@ -156,34 +154,32 @@ const userLogIn = async (req, res) => {
                 .status(400)
                 .json({ status: false, msg: `password is mandatory field!` });
         }
-        // validation ends ------------
 
         const findUser = await userModel.findOne({
             email: email,
+
         });
 
-        const isValidPassword = await bcrypt.compare(req.body.password, findUser.password)    //password hashing -bcrypt  
+        const isValidPassword = await bcrypt.compare(req.body.password, findUser.password)
 
         if (!isValidPassword) {
             return res
                 .status(401)
                 .json({ status: false, msg: `Invalid email or password!` });
         }
+        // validation ends -----------------------------
 
-        //   generate token ---------------
-        const token = jwt.sign(
+        //   Generate token -----------------------
+        const token = await jwt.sign(
             {
                 userId: findUser._id,
             },
-            "thorium@group8", { expiresIn: '1500mins' }
+            jwtSecretKey, { expiresIn: '1500mins' }
         );
 
-        res.setHeader("x-api-key", token);
-        let UserID = findUser._id
-        let finalData = { token, UserID }
-        res
-            .status(201)
-            .json({ status: true, msg: `user login successful`, data: finalData });
+        res.status(200).json({ status: true, msg: `Login Successful`, data: { token, userId: findUser._id } });
+
+
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });
     }
@@ -192,6 +188,7 @@ const userLogIn = async (req, res) => {
 const getUserProfile = async (req, res) => {
     try {
         let { userId: _id } = req.params;
+
         if (!validator.isValidObjectId(_id)) {
             return res.status(400).json({ status: false, msg: `Invalid ID!` });
         }
@@ -212,6 +209,7 @@ const getUserProfile = async (req, res) => {
 const updateUserProfile = async (req, res) => {
     try {
         let { userId: _id } = req.params;
+
         let requestBody = req.body;
         let files = req.files
 
@@ -243,6 +241,9 @@ const updateUserProfile = async (req, res) => {
             //console.log(checkID._id, req.params.userId );
             return res.status(401).json({ status: false, msg: `User not authorised to update profile!` });
         }
+
+        requestBody.password = await bcrypt.hash(requestBody.password, 10);   //bcrypt password hashing
+        profileImage = await aws.uploadFile(files[0]);
 
         const isValidPassword = await bcrypt.compare(req.body.password, checkID.password) 
 
